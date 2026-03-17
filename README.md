@@ -2,6 +2,10 @@
 
 Hackathon-quality MVP for an appointment discovery and booking assistant using FastAPI, SQLite, and a template-based conversation engine powered by Qwen3-Embedding.
 
+
+###Demo Video Link: 
+https://drive.google.com/file/d/1W6_tdsUY3_s2o6SVbCRKxov5_oaTHHsE/view?pli=1
+
 ### Features
 
 - **Input form UI** (FastAPI + Jinja2 + Tailwind) to start a job with patient/appointment details.
