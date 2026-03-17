@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script>
+  // Simple auto-refresh every 5 seconds
+  setTimeout(function() { window.location.reload(); }, 5000);
+</script>
+
+<div class="space-y-6">
+  <div class="bg-white shadow rounded-lg p-6">
+    <div class="flex items-center justify-between mb-2">
+      <h2 class="text-lg font-semibold text-slate-800">Job #{{ job.id }}</h2>
+      <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium
+        {% if job.status == 'completed' %} bg-emerald-100 text-emerald-800
+        {% elif job.status == 'running' %} bg-indigo-100 text-indigo-800
+        {% else %} bg-slate-100 text-slate-700{% endif %}">
+        Status: {{ job.status }}
+      </span>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-700">
+      <div>
+        <p><span class="font-medium">Patient:</span> {{ job.patient_name }}</p>
+        <p><span class="font-medium">Phone:</span> {{ job.patient_phone }}</p>
+        <p><span class="font-medium">Address:</span> {{ job.patient_address }}</p>
+      </div>
+      <div>
+        <p><span class="font-medium">Specialization:</span> {{ job.doctor_specialization }}</p>
+        <p><span class="font-medium">Insurance:</span> {{ job.insurance_company }}</p>
+        <p><span class="font-medium">Date range:</span> {{ job.date_from }} → {{ job.date_to }} ({{ job.priority }})</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-white shadow rounded-lg p-4 md:col-span-2">
+      <h3 class="text-sm font-semibold text-slate-800 mb-2">Clinics & Call Status</h3>
+      {% if clinics %}
+        <div class="space-y-3">
+          {% for clinic in clinics %}
+            <div class="border border-slate-100 rounded-lg p-3">
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="font-medium text-slate-900">{{ clinic.name }}</p>
+                  <p class="text-xs text-slate-600">{{ clinic.address }}</p>
+                  <p class="text-xs text-slate-600">Phone: {{ clinic.phone }}</p>
+                  {% if clinic.rating %}
+                    <p class="text-xs text-amber-600">Rating: {{ '%.1f'|format(clinic.rating) }}</p>
+                  {% endif %}
+                </div>
+                <span class="text-xs px-2 py-1 rounded-full
+                  {% if clinic.state == 'collected' %} bg-emerald-100 text-emerald-800
+                  {% elif clinic.state == 'calling' %} bg-indigo-100 text-indigo-800
+                  {% elif clinic.state == 'unsuitable' %} bg-rose-100 text-rose-800
+                  {% else %} bg-slate-100 text-slate-700{% endif %}">
+                  {{ clinic.state }}
+                </span>
+              </div>
+              {% set clinic_calls = calls_by_clinic.get(clinic.id) or [] %}
+              {% if clinic_calls %}
+                <details class="mt-2">
+                  <summary class="text-xs text-slate-600 cursor-pointer">View transcript</summary>
+                  <pre class="mt-1 text-[11px] bg-slate-50 rounded p-2 whitespace-pre-wrap">{{ clinic_calls[0].transcript }}</pre>
+                </details>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-sm text-slate-600">No clinics added yet.</p>
+      {% endif %}
+    </div>
+
+    <div class="bg-white shadow rounded-lg p-4 space-y-4">
+      <div>
+        <h3 class="text-sm font-semibold text-slate-800 mb-1">Best Appointment</h3>
+        {% if best_appointment %}
+          <div class="border border-emerald-200 bg-emerald-50 rounded-lg p-3 text-sm">
+            <p><span class="font-medium">Clinic:</span> {{ best_appointment.clinic.name }}</p>
+            <p><span class="font-medium">Date:</span> {{ best_appointment.date }}</p>
+            <p><span class="font-medium">Time:</span> {{ best_appointment.time }}</p>
+            <p><span class="font-medium">Provider:</span> {{ best_appointment.provider or 'Not specified' }}</p>
+            <p><span class="font-medium">Insurance:</span>
+              {% if best_appointment.insurance_accepted is none %}Unknown
+              {% elif best_appointment.insurance_accepted %}Accepted
+              {% else %}Not accepted{% endif %}
+            </p>
+          </div>
+        {% else %}
+          <p class="text-sm text-slate-600">No appointment selected yet.</p>
+        {% endif %}
+      </div>
+
+      <div>
+        <h3 class="text-sm font-semibold text-slate-800 mb-1">All Options</h3>
+        {% if appointment_options %}
+          <ul class="space-y-2 text-xs">
+            {% for opt in appointment_options %}
+              <li class="border rounded px-2 py-1 {% if opt.is_selected_best %}border-emerald-300 bg-emerald-50{% else %}border-slate-200{% endif %}">
+                <div class="flex justify-between">
+                  <span>{{ opt.date }} {{ opt.time }}</span>
+                  <span>{{ opt.clinic.name }}</span>
+                </div>
+                <div class="flex justify-between text-[11px] text-slate-600">
+                  <span>{{ opt.provider or 'No provider' }}</span>
+                  <span>
+                    {% if opt.insurance_accepted is none %}Insurance: Unknown
+                    {% elif opt.insurance_accepted %}Insurance: Accepted
+                    {% else %}Insurance: Not accepted{% endif %}
+                  </span>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-sm text-slate-600">No appointment options yet.</p>
+        {% endif %}
+      </div>
+
+      <div class="text-xs text-slate-700">
+        <p><span class="font-medium">Booking status:</span> {{ job.booking_status }}</p>
+        <p><span class="font-medium">WhatsApp status:</span> {{ job.whatsapp_status }}</p>
+        <p class="mt-1 text-[11px] text-slate-500">
+          Mock calls: {{ 'on' if settings.mock_calls else 'off' }},
+          WhatsApp: {% if settings.send_whatsapp %}live{% else %}skipped{% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

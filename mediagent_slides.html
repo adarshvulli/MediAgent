@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediAgent – NVIDIA Hackathon</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --nvidia-green: #76b900;
+    --deep: #0a0e14;
+    --card: #111820;
+    --card2: #0d1520;
+    --border: rgba(118,185,0,0.18);
+    --text: #e8f0e0;
+    --muted: #7a9070;
+    --accent: #76b900;
+    --red: #ff4444;
+    --blue: #4ab3f4;
+    --white: #f0f5e8;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--deep);
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .deck {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 60px 80px;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .slide.active {
+    display: flex;
+    opacity: 1;
+  }
+
+  /* BG patterns */
+  .slide::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 90% 10%, rgba(118,185,0,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 10% 90%, rgba(74,179,244,0.05) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .slide-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(118,185,0,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(118,185,0,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+  }
+
+  /* NAV */
+  .nav {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    z-index: 100;
+    background: rgba(10,14,20,0.9);
+    border: 1px solid var(--border);
+    padding: 10px 20px;
+    border-radius: 40px;
+    backdrop-filter: blur(12px);
+  }
+
+  .nav button {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    transition: all 0.2s;
+  }
+
+  .nav button:hover { background: var(--accent); border-color: var(--accent); color: #000; }
+
+  .nav-dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .dot.active { background: var(--accent); width: 20px; border-radius: 3px; }
+
+  /* SLIDE COUNTER */
+  .slide-num {
+    position: fixed;
+    top: 24px;
+    right: 36px;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    z-index: 100;
+    font-family: 'Syne', sans-serif;
+  }
+
+  /* LOGO BAR */
+  .logo-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 48px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .logo-pill {
+    background: var(--accent);
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    padding: 5px 14px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+
+  .logo-tag {
+    color: var(--muted);
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* ===== SLIDE 1 – TITLE ===== */
+  #s1 .headline {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 72px;
+    line-height: 1.0;
+    color: var(--white);
+    position: relative;
+    z-index: 2;
+    margin-bottom: 12px;
+  }
+
+  #s1 .headline span { color: var(--accent); }
+
+  #s1 .subline {
+    font-size: 22px;
+    color: var(--muted);
+    font-weight: 300;
+    position: relative;
+    z-index: 2;
+    max-width: 640px;
+    line-height: 1.5;
+    margin-bottom: 48px;
+  }
+
+  #s1 .tag-row {
+    display: flex;
+    gap: 12px;
+    position: relative;
+    z-index: 2;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    border: 1px solid var(--border);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    color: var(--muted);
+    background: rgba(118,185,0,0.05);
+  }
+
+  .tag.green { border-color: var(--accent); color: var(--accent); background: rgba(118,185,0,0.1); }
+
+  #s1 .big-bg-text {
+    position: absolute;
+    right: -20px;
+    bottom: 60px;
+    font-family: 'Syne', sans-serif;
+    font-size: 220px;
+    font-weight: 800;
+    color: rgba(118,185,0,0.04);
+    line-height: 1;
+    pointer-events: none;
+    letter-spacing: -8px;
+  }
+
+  /* ===== SLIDE 2 – PROBLEM ===== */
+  .slide-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .slide-headline {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 52px;
+    line-height: 1.1;
+    color: var(--white);
+    position: relative;
+    z-index: 2;
+    margin-bottom: 40px;
+  }
+
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    position: relative;
+    z-index: 2;
+    margin-bottom: 32px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 24px;
+  }
+
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .pain-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .pain-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 16px;
+    color: var(--text);
+  }
+
+  .pain-item::before {
+    content: '✗';
+    color: var(--red);
+    font-size: 18px;
+    width: 20px;
+    flex-shrink: 0;
+  }
+
+  /* ===== SLIDE 3 – SOLUTION ===== */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+  }
+
+  .solution-desc {
+    font-size: 18px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 32px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    font-size: 15px;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .feature-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: rgba(118,185,0,0.15);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .quote-block {
+    background: var(--card);
+    border-left: 3px solid var(--accent);
+    padding: 24px 28px;
+    border-radius: 0 12px 12px 0;
+    font-size: 20px;
+    font-style: italic;
+    color: var(--white);
+    line-height: 1.6;
+    position: relative;
+    z-index: 2;
+    margin-bottom: 24px;
+  }
+
+  /* ===== SLIDE 4 – ARCHITECTURE ===== */
+  .flow-container {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .flow-step {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px 16px;
+    text-align: center;
+    position: relative;
+  }
+
+  .flow-step:hover { border-color: var(--accent); }
+
+  .flow-step .step-icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .flow-step .step-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .flow-step .step-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+
+  .flow-step .step-desc {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .flow-arrow {
+    color: var(--accent);
+    font-size: 20px;
+    padding: 0 6px;
+    flex-shrink: 0;
+  }
+
+  .arch-bottom {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    position: relative;
+    z-index: 2;
+    margin-top: 24px;
+  }
+
+  .arch-card {
+    background: rgba(118,185,0,0.05);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px;
+  }
+
+  .arch-card .ac-label {
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .arch-card .ac-value {
+    color: var(--accent);
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  /* ===== SLIDE 5 – TECH STACK ===== */
+  .stack-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .stack-group {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+  }
+
+  .stack-group-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stack-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .stack-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .stack-item .si-name {
+    font-size: 14px;
+    color: var(--white);
+    font-weight: 500;
+  }
+
+  .stack-item .si-role {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ===== SLIDE 6 – SECURITY ===== */
+  .security-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    position: relative;
+    z-index: 2;
+  }
+
+  .sec-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 24px;
+  }
+
+  .sec-icon {
+    font-size: 32px;
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .sec-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+
+  .sec-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ===== SLIDE 7 – IMPACT ===== */
+  .impact-two {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 40px;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+  }
+
+  .impact-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .impact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+
+  .ii-icon {
+    font-size: 22px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .ii-content .ii-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .ii-content .ii-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .impact-side {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .side-stat {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 20px;
+    text-align: center;
+    flex: 1;
+  }
+
+  .side-stat .ss-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .side-stat .ss-label {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  /* ===== SLIDE 8 – END CARD ===== */
+  #s8 {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  #s8 .end-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 96px;
+    line-height: 0.95;
+    color: var(--white);
+    position: relative;
+    z-index: 2;
+    margin-bottom: 8px;
+  }
+
+  #s8 .end-title span { color: var(--accent); }
+
+  #s8 .end-sub {
+    font-size: 22px;
+    color: var(--muted);
+    font-weight: 300;
+    position: relative;
+    z-index: 2;
+    margin-bottom: 48px;
+  }
+
+  #s8 .end-tags {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    flex-wrap: wrap;
+    margin-bottom: 48px;
+  }
+
+  #s8 .end-tag {
+    border: 1px solid var(--border);
+    padding: 10px 22px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--card);
+  }
+
+  #s8 .end-tag.accent {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+    font-weight: 700;
+  }
+
+  #s8 .big-ring {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    border: 1px solid rgba(118,185,0,0.08);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  #s8 .big-ring:nth-child(2) { width: 400px; height: 400px; border-color: rgba(118,185,0,0.12); }
+  #s8 .big-ring:nth-child(3) { width: 200px; height: 200px; border-color: rgba(118,185,0,0.2); }
+
+  .kbd-hint {
+    position: fixed;
+    bottom: 32px;
+    right: 36px;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <!-- ===== SLIDE 1 – TITLE ===== -->
+  <div class="slide active" id="s1">
+    <div class="slide-grid"></div>
+    <div class="logo-bar">
+      <div class="logo-pill">MEDI AGENT</div>
+      <div class="logo-tag">NVIDIA Hackathon 2025</div>
+    </div>
+    <h1 class="headline">AI That <span>Calls</span><br>Your Doctor<br>For You.</h1>
+    <p class="subline">A voice AI agent that finds the right specialist, checks your insurance, and books the appointment — so you don't have to.</p>
+    <div class="tag-row">
+      <div class="tag green">🏆 NVIDIA Stack</div>
+      <div class="tag">FastAPI + Twilio</div>
+      <div class="tag">Qwen 14B Local LLM</div>
+      <div class="tag">Google Maps API</div>
+      <div class="tag">Open Source</div>
+    </div>
+    <div class="big-bg-text">Rx</div>
+  </div>
+
+  <!-- ===== SLIDE 2 – PROBLEM ===== -->
+  <div class="slide" id="s2">
+    <div class="slide-grid"></div>
+    <div class="logo-bar">
+      <div class="logo-pill">MEDI AGENT</div>
+      <div class="logo-tag">The Problem</div>
+    </div>
+    <div class="slide-title">01 — Problem Statement</div>
+    <div class="slide-headline">Healthcare is broken<br>at the front door.</div>
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-num">26</div>
+        <div class="stat-label">Average days to see a specialist in the US</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">30%</div>
+        <div class="stat-label">Americans delay care due to insurance confusion</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">3+</div>
+        <div class="stat-label">Hours spent on average booking a specialist appointment</div>
+      </div>
+    </div>
+    <div class="pain-list">
+      <div class="pain-item">Insurance add-ons required for specialist coverage — most patients don't know</div>
+      <div class="pain-item">Phone tag with multiple clinics to find availability</div>
+      <div class="pain-item">No centralized way to compare earliest available appointments</div>
+      <div class="pain-item">Underinsured & uninsured patients have no automated pathway</div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 3 – SOLUTION ===== -->
+  <div class="slide" id="s3">
+    <div class="slide-grid"></div>
+    <div class="logo-bar">
+      <div class="logo-pill">MEDI AGENT</div>
+      <div class="logo-tag">The Solution</div>
+    </div>
+    <div class="slide-title">02 — Solution</div>
+    <div class="slide-headline">One form. Multiple calls.<br>Best slot. Booked.</div>
+    <div class="quote-block">"I'm calling on behalf of a patient to check availability and insurance acceptance…"</div>
+    <div class="two-col" style="flex:unset">
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-icon">📋</div>
+          <div>Patient fills one form: name, address, insurance, specialization, date range, health brief</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🗺️</div>
+          <div>Agent finds all nearby matching clinics via Google Maps within specified radius</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📞</div>
+          <div>Makes real outbound calls to each clinic using Twilio Voice, powered by Qwen 14B LLM</div>
+        </div>
+      </div>
+      <div class="feature-list">
+        <div class="feature-item">
+          <div class="feature-icon">🧠</div>
+          <div>Extracts: insurance accepted?, earliest date, provider name, booking requirements</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🏆</div>
+          <div>Ranks all options, selects earliest valid slot, places final booking call</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">💬</div>
+          <div>Sends WhatsApp confirmation with all appointment details to patient instantly</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 4 – ARCHITECTURE ===== -->
+  <div class="slide" id="s4">
+    <div class="slide-grid"></div>
+    <div class="logo-bar">
+      <div class="logo-pill">MEDI AGENT</div>
+      <div class="logo-tag">Architecture</div>
+    </div>
+    <div class="slide-title">03 — How It Works</div>
+    <div class="slide-headline" style="font-size:38px; margin-bottom:28px">8-Module Pipeline</div>
+    <div class="flow-container">
+      <div class="flow-step">
+        <span class="step-icon">📝</span>
+        <div class="step-num">Step 1</div>
+        <div class="step-title">Input Intake</div>
+        <div class="step-desc">Patient details, insurance, specialization, date range</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <span class="step-icon">📍</span>
+        <div class="step-num">Step 2</div>
+        <div class="step-title">Geo Search</div>
+        <div class="step-desc">Address → lat/lng → Google Maps clinic discovery</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <span class="step-icon">📞</span>
+        <div class="step-num">Step 3</div>
+        <div class="step-title">Call Loop</div>
+        <div class="step-desc">Twilio outbound → speech transcribe → Qwen reply</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <span class="step-icon">🔍</span>
+        <div class="step-num">Step 4</div>
+        <div class="step-title">Extract</div>
+        <div class="step-desc">Insurance check, earliest date, provider, requirements</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">
+        <span class="step-icon">✅</span>
+        <div class="step-num">Step 5</div>
+        <div class="step-title">Book & Notify</div>
+        <div class="step-desc">Final booking call + WhatsApp confirmation</div>
+      </div>
+    </div>
+    <div class="arch-bottom">
+      <div class="arch-card">
+        <div class="ac-label">State Machine</div>
+        <div class="ac-value">pending → calling → gathering → booked</div>
+      </div>
+      <div class="arch-card">
+        <div class="ac-label">Early Stop Rule</div>
+        <div class="ac-value">If date_from exact match → stop & book immediately</div>
+      </div>
+      <div class="arch-card">
+        <div class="ac-label">Fallback</div>
+        <div class="ac-value">MOCK_CALLS=true for safe demo mode</div>
+      </div>
+      <div class="arch-card">
+        <div class="ac-label">Persistence</div>
+        <div class="ac-value">SQLite — all transcripts, calls, slots logged</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 5 – TECH STACK ===== -->
+  <div class="slide" id="s5">
+    <div class="slide-grid"></div>
+    <div class="logo-bar">
+      <div class="logo-pill">MEDI AGENT</div>
+      <div class="logo-tag">Tech Stack</div>
+    </div>
+    <div class="slide-title">04 — Technology Stack</div>
+    <div class="slide-headline" style="font-size:38px; margin-bottom:28px">Built on NVIDIA. Open Source. Production-ready.</div>
+    <div class="stack-grid">
+      <div class="stack-group">
+        <div class="stack-group-title">🤖 AI / Voice</div>
+        <div class="stack-items">
+          <div class="stack-item"><span class="si-name">Qwen 14B (local HuggingFace)</span><span class="si-role">Conversation brain</span></div>
+          <div class="stack-item"><span class="si-name">Twilio Programmable Voice</span><span class="si-role">Outbound calls + TTS</span></div>
+          <div class="stack-item"><span class="si-name">Twilio Speech Webhooks</span><span class="si-role">Live transcription</span></div>
+          <div class="stack-item"><span class="si-name">NeMo Guardrails (design)</span><span class="si-role">Safety + PII rails</span></div>
+        </div>
+      </div>
+      <div class="stack-group">
+        <div class="stack-group-title">🗺️ Discovery</div>
+        <div class="stack-items">
+          <div class="stack-item"><span class="si-name">Google Maps Geocoding API</span><span class="si-role">Address → coordinates</span></div>
+          <div class="stack-item"><span class="si-name">Google Places API</span><span class="si-role">Nearby clinic search</span></div>
+          <div class="stack-item"><span class="si-name">Radius-based ranking</span><span class="si-role">Filter + sort clinics</span></div>
+        </div>
+      </div>
+      <div class="stack-group">
+        <div class="stack-group-title">⚙️ Backend</div>
+        <div class="stack-items">
+          <div class="stack-item"><span class="si-name">FastAPI + Python</span><span class="si-role">API server</span></div>
+          <div class="stack-item"><span class="si-name">SQLite + SQLAlchemy</span><span class="si-role">Persistence</span></div>
+          <div class="stack-item"><span class="si-name">ngrok</span><span class="si-role">Twilio webhook tunneling</span></div>
+          <div class="stack-item"><span class="si-name">Pydantic</span><span class="si-role">Validation models</span></div>
+        </div>
+      </div>
+      <div class="stack-group">
+        <div class="stack-group-title">🖥️ Frontend + Notifications</div>
+        <div class="stack-items">
+          <div class="stack-item"><span class="si-name">Jinja2 + TailwindCSS</span><span class="si-role">Clean demo UI</span></div>
+          <div class="stack-item"><span class="si-name">Auto-refresh dashboard</span><span class="si-role">Live job status</span></div>
+          <div class="stack-item"><span class="si-name">PyWhatKit</span><span class="si-role">WhatsApp confirmation</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 6 – SECURITY ===== -->
+  <div class="slide" id="s6">
+    <div class="slide-grid"></div>
+    <div class="logo-bar">
+      <div class="logo-pill">MEDI AGENT</div>
+      <div class="logo-tag">Trust & Safety</div>
+    </div>
+    <div class="slide-title">05 — Security & Trust</div>
+    <div class="slide-headline" style="font-size:42px; margin-bottom:32px">Patient data handled<br>with guardrails.</div>
+    <div class="security-grid">
+      <div class="sec-card">
+        <span class="sec-icon">🛡️</span>
+        <div class="sec-title">NeMo Guardrails</div>
+        <div class="sec-desc">NVIDIA NeMo Guardrails design — input/output rails prevent PII leakage and off-topic responses during calls</div>
+      </div>
+      <div class="sec-card">
+        <span class="sec-icon">🔒</span>
+        <div class="sec-title">No Persistent PII</div>
+        <div class="sec-desc">Patient data is session-scoped. Health briefs used only when clinics ask. No post-session data retention by design</div>
+      </div>
+      <div class="sec-card">
+        <span class="sec-icon">📜</span>
+        <div class="sec-title">HIPAA-Aligned Design</div>
+        <div class="sec-desc">Architecture intent is HIPAA-aligned. Insurance details, names, phone numbers handled via env-var secrets, never hardcoded</div>
+      </div>
+      <div class="sec-card">
+        <span class="sec-icon">🤐</span>
+        <div class="sec-title">AI Identity Policy</div>
+        <div class="sec-desc">Agent does not proactively reveal it's AI. Focuses on scheduling logistics only. Uses health brief minimally and only when asked</div>
+      </div>
+      <div class="sec-card">
+        <span class="sec-icon">🧱</span>
+        <div class="sec-title">Local LLM</div>
+        <div class="sec-desc">Qwen 14B runs fully on-device. No patient data leaves to external LLM APIs. Full data sovereignty</div>
+      </div>
+      <div class="sec-card">
+        <span class="sec-icon">📊</span>
+        <div class="sec-title">Full Audit Log</div>
+        <div class="sec-desc">Every call attempt, transcript turn, extracted fact, and booking result is logged in SQLite for full transparency</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 7 – IMPACT ===== -->
+  <div class="slide" id="s7">
+    <div class="slide-grid"></div>
+    <div class="logo-bar">
+      <div class="logo-pill">MEDI AGENT</div>
+      <div class="logo-tag">Impact</div>
+    </div>
+    <div class="slide-title">06 — Why This Matters</div>
+    <div class="slide-headline" style="font-size:42px; margin-bottom:28px">Healthcare access<br>for everyone.</div>
+    <div class="impact-two">
+      <div class="impact-list">
+        <div class="impact-item">
+          <div class="ii-icon">🏥</div>
+          <div class="ii-content">
+            <div class="ii-title">Uninsured & Underinsured</div>
+            <div class="ii-desc">Open source model means it can be deployed by free clinics, NGOs, and community health centers at zero marginal cost</div>
+          </div>
+        </div>
+        <div class="impact-item">
+          <div class="ii-icon">⏱️</div>
+          <div class="ii-content">
+            <div class="ii-title">Saves 2–3 Hours Per Booking</div>
+            <div class="ii-desc">Automates phone research that patients and caregivers currently do manually across dozens of calls</div>
+          </div>
+        </div>
+        <div class="impact-item">
+          <div class="ii-icon">🌍</div>
+          <div class="ii-content">
+            <div class="ii-title">Globally Adaptable</div>
+            <div class="ii-desc">Swap insurance logic, language model, or geocoding layer to deploy in any country's healthcare system</div>
+          </div>
+        </div>
+        <div class="impact-item">
+          <div class="ii-icon">🔓</div>
+          <div class="ii-content">
+            <div class="ii-title">Open Source First</div>
+            <div class="ii-desc">Built on fully open components — Qwen, FastAPI, SQLite. No vendor lock-in. Fork, extend, deploy</div>
+          </div>
+        </div>
+      </div>
+      <div class="impact-side">
+        <div class="side-stat">
+          <div class="ss-num">0$</div>
+          <div class="ss-label">Marginal cost to deploy<br>at community clinics</div>
+        </div>
+        <div class="side-stat">
+          <div class="ss-num">~3min</div>
+          <div class="ss-label">Average time to find &<br>confirm best appointment</div>
+        </div>
+        <div class="side-stat">
+          <div class="ss-num">100%</div>
+          <div class="ss-label">Local inference —<br>data never leaves device</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SLIDE 8 – END ===== -->
+  <div class="slide" id="s8">
+    <div class="slide-grid"></div>
+    <div class="big-ring"></div>
+    <div class="big-ring"></div>
+    <div class="big-ring"></div>
+    <div class="end-title">Medi<span>Agent</span></div>
+    <div class="end-sub">AI-powered. NVIDIA-built. Healthcare for everyone.</div>
+    <div class="end-tags">
+      <div class="end-tag accent">🏆 NVIDIA Hackathon</div>
+      <div class="end-tag">FastAPI + Twilio</div>
+      <div class="end-tag">Qwen 14B Local</div>
+      <div class="end-tag">Google Maps API</div>
+      <div class="end-tag">Open Source</div>
+      <div class="end-tag">PyWhatKit Notifications</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- SLIDE NUMBER -->
+<div class="slide-num" id="slideNum">01 / 08</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button onclick="prevSlide()">← Prev</button>
+  <div class="nav-dots" id="dots"></div>
+  <button onclick="nextSlide()">Next →</button>
+</div>
+
+<div class="kbd-hint">← → keys to navigate</div>
+
+<script>
+  let current = 0;
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  const dotsEl = document.getElementById('dots');
+  const numEl = document.getElementById('slideNum');
+
+  // Build dots
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  }
+
+  function goTo(n) {
+    slides[current].classList.remove('active');
+    document.querySelectorAll('.dot')[current].classList.remove('active');
+    current = (n + total) % total;
+    slides[current].classList.add('active');
+    document.querySelectorAll('.dot')[current].classList.add('active');
+    numEl.textContent = String(current + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+  }
+
+  function nextSlide() { goTo(current + 1); }
+  function prevSlide() { goTo(current - 1); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextSlide();
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prevSlide();
+  });
+</script>
+</body>
+</html>

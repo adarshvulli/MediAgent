@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="bg-white shadow rounded-lg p-6">
+  <h2 class="text-lg font-semibold mb-4 text-slate-800">Start a new appointment search</h2>
+  <form method="post" action="/jobs/start" class="space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Patient Name</label>
+        <input name="patient_name" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Patient Phone</label>
+        <input name="patient_phone" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700">Patient Address</label>
+      <input name="patient_address" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Doctor Specialization</label>
+        <input name="doctor_specialization" placeholder="e.g. Cardiologist" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Insurance Company</label>
+        <input name="insurance_company" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Max Radius (miles)</label>
+        <input name="max_radius_miles" type="number" step="0.1" value="10" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Date From (YYYY-MM-DD)</label>
+        <input name="date_from" placeholder="2026-03-20" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Date To (YYYY-MM-DD)</label>
+        <input name="date_to" placeholder="2026-03-30" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700">Priority</label>
+        <select name="priority" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm">
+          <option value="earliest">Earliest</option>
+          <option value="within_range">Within date range</option>
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700">Health Issue (brief)</label>
+      <textarea name="health_issue_brief" rows="3" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm" placeholder="Short description for the clinic"></textarea>
+    </div>
+
+    <div class="pt-4">
+      <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none">
+        Start Voice Agent
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+

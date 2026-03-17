@@ -1,0 +1,76 @@
+{
+  "intents": [
+    {
+      "name": "greeting",
+      "examples": [
+        "hello",
+        "hi",
+        "good morning",
+        "good afternoon",
+        "how can I help you"
+      ],
+      "response": "Hello, I'm calling to check appointment availability for a patient."
+    },
+    {
+      "name": "ask_insurance",
+      "examples": [
+        "insurance",
+        "do you accept",
+        "which insurance",
+        "we take",
+        "we accept"
+      ],
+      "response": "Do you accept {insurance_company}?"
+    },
+    {
+      "name": "ask_availability",
+      "examples": [
+        "availability",
+        "when is the next appointment",
+        "earliest appointment",
+        "next available",
+        "schedule"
+      ],
+      "response": "What is your earliest available appointment for {specialization}?"
+    },
+    {
+      "name": "provide_issue",
+      "examples": [
+        "what is the issue",
+        "what's the problem",
+        "symptoms",
+        "what are they experiencing"
+      ],
+      "response": "The patient is experiencing {health_issue_brief}."
+    },
+    {
+      "name": "confirm_details",
+      "examples": [
+        "can you confirm",
+        "please confirm",
+        "is that correct"
+      ],
+      "response": "Let me confirm the details: {summary}."
+    },
+    {
+      "name": "booking_request",
+      "examples": [
+        "book",
+        "schedule",
+        "set up",
+        "confirm appointment"
+      ],
+      "response": "I'd like to book that appointment for the patient, please."
+    },
+    {
+      "name": "fallback",
+      "examples": [
+        "other",
+        "unclear",
+        "unknown"
+      ],
+      "response": "Could you please repeat that more clearly?"
+    }
+  ]
+}
+
